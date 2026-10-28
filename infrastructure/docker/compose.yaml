@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: findly_postgres
+    environment:
+      POSTGRES_USER: findly
+      POSTGRES_PASSWORD: findly_dev_password
+      POSTGRES_DB: findly_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - findly_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U findly -d findly_dev"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  typesense:
+    image: typesense/typesense:0.25.0
+    container_name: findly_typesense
+    environment:
+      TYPESENSE_API_KEY: typesense_dev_key_12345
+      TYPESENSE_DATA_DIR: /typesense-data
+    ports:
+      - "8108:8108"
+    volumes:
+      - findly_typesense_data:/typesense-data
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:8108/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  findly_postgres_data:
+  findly_typesense_data:
