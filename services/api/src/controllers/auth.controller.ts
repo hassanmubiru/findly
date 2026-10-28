@@ -2,7 +2,6 @@ import { Controller, Post, Get } from 'streetjs';
 import type { StreetContext } from 'streetjs';
 import { container } from 'streetjs';
 import { AuthService } from '../services/auth.service.js';
-import { authMiddleware } from 'streetjs';
 
 @Controller('/api/v1/auth')
 export class AuthController {
@@ -40,7 +39,7 @@ export class AuthController {
     try {
       const result = await authService.login(body.email, body.password);
       ctx.json({ user: result.user, token: result.token });
-    } catch (err) {
+    } catch {
       ctx.json({ error: 'Invalid credentials' }, 401);
     }
   }

@@ -16,7 +16,7 @@ export class AuthService {
     private readonly userRepo: UserRepository,
     jwtSecret: string
   ) {
-    this.jwtService = new JwtService({ secret: jwtSecret });
+    this.jwtService = new JwtService(jwtSecret);
   }
 
   async register(email: string, password: string, name: string): Promise<AuthResult> {

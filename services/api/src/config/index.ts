@@ -1,5 +1,3 @@
-import { z } from 'zod';
-
 export class AppConfig {
   httpPort = 3000;
   httpHost = '0.0.0.0';

@@ -1,5 +1,5 @@
 import { Injectable } from 'streetjs';
-import { FavoriteRepository } from '../repositories/favorite.repository.js';
+import { FavoriteRepository, Favorite } from '../repositories/favorite.repository.js';
 import { BusinessRepository } from '../repositories/business.repository.js';
 
 @Injectable()
@@ -9,7 +9,7 @@ export class FavoriteService {
     private readonly businessRepo: BusinessRepository
   ) {}
 
-  async add(userId: string, businessId: string): Promise<FavoriteRepository['Favorite']> {
+  async add(userId: string, businessId: string): Promise<Favorite> {
     const existing = await this.favoriteRepo.findByUserAndBusiness(userId, businessId);
     if (existing) {
       return existing;
@@ -24,10 +24,10 @@ export class FavoriteService {
   }
 
   async remove(userId: string, businessId: string): Promise<boolean> {
-    return this.favoriteRepo.delete(userId, businessId);
+    return this.favoriteRepo.deleteByUserAndBusiness(userId, businessId);
   }
 
-  async list(userId: string, limit = 20, offset = 0): Promise<{ favorites: FavoriteRepository['Favorite'][]; total: number }> {
+  async list(userId: string, limit = 20, offset = 0): Promise<{ favorites: Favorite[]; total: number }> {
     const favorites = await this.favoriteRepo.findByUser(userId, limit, offset);
     const total = await this.favoriteRepo.countByUser(userId);
     return { favorites, total };

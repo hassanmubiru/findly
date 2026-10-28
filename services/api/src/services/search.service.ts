@@ -1,6 +1,7 @@
 import { Injectable } from 'streetjs';
 import { TypesenseService } from './typesense.service.js';
 import { BusinessRepository } from '../repositories/business.repository.js';
+import { PgPool } from 'streetjs/pool';
 
 export interface SearchResult {
   businesses: {
@@ -30,10 +31,14 @@ export interface SearchResult {
 
 @Injectable()
 export class SearchService {
+  private fallbackPool: PgPool | null = null;
+
   constructor(
     private readonly typesense: TypesenseService,
-    private readonly businessRepo: BusinessRepository
-  ) {}
+    businessRepo: BusinessRepository
+  ) {
+    this.fallbackPool = (businessRepo as unknown as { pool: PgPool }).pool;
+  }
 
   async search(params: {
     q: string;
@@ -70,7 +75,7 @@ export class SearchService {
       });
 
       return {
-        businesses: result.hits.map(h => h.document),
+        businesses: result.hits.map(h => h.document as SearchResult['businesses'][0]),
         total: result.found,
         page: result.page,
         facets: {
@@ -93,6 +98,10 @@ export class SearchService {
     page?: number;
     per_page?: number;
   }): Promise<SearchResult> {
+    if (!this.fallbackPool) {
+      return { businesses: [], total: 0, page: 1, facets: { category_names: [], neighborhood_names: [] }, query: params.q };
+    }
+
     const offset = ((params.page ?? 1) - 1) * (params.per_page ?? 20);
 
     let query = 'SELECT * FROM businesses WHERE status = $1';
@@ -122,17 +131,29 @@ export class SearchService {
 
     const countQuery = query.replace('SELECT *', 'SELECT COUNT(*) as total').split('LIMIT')[0];
 
-    const { query: dbQuery } = await import('streetjs');
-    const pool = (this.businessRepo as unknown as { pool: { query: typeof dbQuery } }).pool;
-
     const [result, countResult] = await Promise.all([
-      pool.query(query, queryParams),
-      pool.query(countQuery, queryParams.slice(0, -2)),
+      this.fallbackPool.query(query, queryParams),
+      this.fallbackPool.query(countQuery, queryParams.slice(0, -2)),
     ]);
 
     return {
-      businesses: result.rows,
-      total: parseInt(countResult.rows[0]?.total ?? '0', 10),
+      businesses: result.rows.map((r: Record<string, unknown>) => ({
+        id: String(r.id),
+        name: String(r.name),
+        description: r.description as string | null,
+        slug: String(r.slug),
+        address: r.address as string | null,
+        latitude: r.latitude ? Number(r.latitude) : null,
+        longitude: r.longitude ? Number(r.longitude) : null,
+        phone: r.phone as string | null,
+        website: r.website as string | null,
+        city_id: r.city_id as string | null,
+        neighborhood_id: r.neighborhood_id as string | null,
+        category_ids: [],
+        category_names: [],
+        service_names: [],
+      })),
+      total: parseInt(String(countResult.rows[0]?.total ?? '0'), 10),
       page: params.page ?? 1,
       facets: { category_names: [], neighborhood_names: [] },
       query: params.q ?? '',

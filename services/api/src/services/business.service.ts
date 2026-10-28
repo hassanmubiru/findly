@@ -1,8 +1,6 @@
 import { Injectable } from 'streetjs';
-import { BusinessRepository } from '../repositories/business.repository.js';
+import { BusinessRepository, Business } from '../repositories/business.repository.js';
 import { TypesenseService, BusinessDocument } from './typesense.service.js';
-import type { StreetContext } from 'streetjs';
-import { BadRequestException, NotFoundException } from 'streetjs';
 
 @Injectable()
 export class BusinessService {
@@ -11,23 +9,23 @@ export class BusinessService {
     private readonly typesense: TypesenseService
   ) {}
 
-  async getById(id: string): Promise<BusinessRepository['Business'] | null> {
+  async getById(id: string): Promise<Business | null> {
     return this.businessRepo.findPublishedById(id);
   }
 
-  async getBySlug(slug: string): Promise<BusinessRepository['Business'] | null> {
+  async getBySlug(slug: string): Promise<Business | null> {
     return this.businessRepo.findBySlug(slug);
   }
 
-  async list(limit = 20, offset = 0): Promise<{ businesses: BusinessRepository['Business'][]; total: number }> {
+  async list(limit = 20, offset = 0): Promise<{ businesses: Business[]; total: number }> {
     return this.businessRepo.findAllPublished(limit, offset);
   }
 
-  async getByNeighborhood(neighborhoodId: string, limit = 20, offset = 0): Promise<BusinessRepository['Business'][]> {
+  async getByNeighborhood(neighborhoodId: string, limit = 20, offset = 0): Promise<Business[]> {
     return this.businessRepo.findByNeighborhood(neighborhoodId, limit, offset);
   }
 
-  async getByCategory(categoryId: string, limit = 20, offset = 0): Promise<BusinessRepository['Business'][]> {
+  async getByCategory(categoryId: string, limit = 20, offset = 0): Promise<Business[]> {
     return this.businessRepo.findByCategory(categoryId, limit, offset);
   }
 
@@ -55,7 +53,7 @@ export class BusinessService {
       owner_id?: string;
     },
     categoryIds: string[] = []
-  ): Promise<BusinessRepository['Business']> {
+  ): Promise<Business> {
     const business = await this.businessRepo.create({
       name: data.name,
       slug: data.slug,
@@ -82,8 +80,8 @@ export class BusinessService {
 
   async update(
     id: string,
-    data: Partial<BusinessRepository['Business']>
-  ): Promise<BusinessRepository['Business'] | null> {
+    data: Partial<Business>
+  ): Promise<Business | null> {
     const updated = await this.businessRepo.update(id, data);
     if (updated && updated.status === 'published') {
       await this.indexBusiness(id);
@@ -142,7 +140,7 @@ export class BusinessService {
     }
   }
 
-  async publish(id: string): Promise<BusinessRepository['Business'] | null> {
+  async publish(id: string): Promise<Business | null> {
     const updated = await this.businessRepo.update(id, { status: 'published' });
     if (updated) {
       await this.indexBusiness(id);
@@ -150,7 +148,7 @@ export class BusinessService {
     return updated;
   }
 
-  async unpublish(id: string): Promise<BusinessRepository['Business'] | null> {
+  async unpublish(id: string): Promise<Business | null> {
     const updated = await this.businessRepo.update(id, { status: 'archived' });
     if (updated) {
       await this.removeFromIndex(id);

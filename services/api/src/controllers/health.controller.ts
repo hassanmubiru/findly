@@ -2,8 +2,6 @@ import { Controller, Get } from 'streetjs';
 import type { StreetContext } from 'streetjs';
 import { container } from 'streetjs';
 import { PgPool } from 'streetjs/pool';
-import { AppConfig } from '../config/index.js';
-import { HealthCheckRegistry } from 'streetjs';
 
 @Controller('/api/v1')
 export class HealthController {
@@ -16,11 +14,10 @@ export class HealthController {
   async ready(ctx: StreetContext): Promise<void> {
     const checks: { [key: string]: { status: string; latency?: number; error?: string } } = {};
 
-    const config = container.resolve<AppConfig>(AppConfig);
     checks['config'] = { status: 'ok' };
 
     try {
-      const pool = container.resolve<PgPool>('PgPool');
+      const pool = container.resolve<PgPool>(PgPool);
       const start = Date.now();
       await pool.query('SELECT 1');
       checks['database'] = { status: 'ok', latency: Date.now() - start };
