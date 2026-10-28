@@ -12,16 +12,21 @@
     "test": "node --test dist/tests/*.test.js",
     "typecheck": "tsc --noEmit"
   },
-  "keywords": ["streetjs", "api", "discovery", "business"],
+  "keywords": [
+    "streetjs",
+    "api",
+    "discovery",
+    "business"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "reflect-metadata": "^0.2.2",
-    "ws": "^8.18.0",
-    "zod": "^3.23.8",
-    "streetjs": "^1.2.9",
     "@streetjs/orm": "^0.1.1",
-    "dotenv": "^16.4.7"
+    "dotenv": "^16.4.7",
+    "reflect-metadata": "^0.2.2",
+    "streetjs": "^1.2.1",
+    "ws": "^8.18.0",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",

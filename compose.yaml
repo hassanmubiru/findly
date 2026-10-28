@@ -9,7 +9,7 @@ services:
       POSTGRES_PASSWORD: findly_dev_password
       POSTGRES_DB: findly_dev
     ports:
-      - "5432:5432"
+      - "15432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -34,30 +34,30 @@ services:
       timeout: 5s
       retries: 5
 
-  api:
-    build:
-      context: ./services/api
-      dockerfile: Dockerfile
-    container_name: findly_api
-    environment:
-      PORT: 3000
-      HOST: 0.0.0.0
-      PG_HOST: postgres
-      PG_PORT: 5432
-      PG_DATABASE: findly_dev
-      PG_USER: findly
-      PG_PASSWORD: findly_dev_password
-      TYPESENSE_HOST: typesense
-      TYPESENSE_PORT: 8108
-      TYPESENSE_API_KEY: typesense_dev_key_12345
-      JWT_SECRET: dev_jwt_secret_change_in_production!!
-    ports:
-      - "3000:3000"
-    depends_on:
-      postgres:
-        condition: service_healthy
-      typesense:
-        condition: service_healthy
+  # api:
+  #   build:
+  #     context: ./services/api
+  #     dockerfile: Dockerfile
+  #   container_name: findly_api
+  #   environment:
+  #     PORT: 3000
+  #     HOST: 0.0.0.0
+  #     PG_HOST: postgres
+  #     PG_PORT: 5432
+  #     PG_DATABASE: findly_dev
+  #     PG_USER: findly
+  #     PG_PASSWORD: findly_dev_password
+  #     TYPESENSE_HOST: typesense
+  #     TYPESENSE_PORT: 8108
+  #     TYPESENSE_API_KEY: typesense_dev_key_12345
+  #     JWT_SECRET: dev_jwt_secret_change_in_production!!
+  #   ports:
+  #     - "3000:3000"
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #     typesense:
+  #       condition: service_healthy
 
 volumes:
   postgres_data:

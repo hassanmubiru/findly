@@ -10,7 +10,7 @@ final searchQueryProvider = StateProvider<String>((ref) => '');
 final searchResultsProvider = FutureProvider.autoDispose<SearchResult>((ref) async {
   final query = ref.watch(searchQueryProvider);
   if (query.isEmpty) {
-    return const SearchResult(
+    return  SearchResult(
       businesses: [],
       total: 0,
       page: 1,
