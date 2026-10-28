@@ -1,0 +1,31 @@
+{
+  "name": "findly-api",
+  "version": "1.0.0",
+  "description": "Findly API - Local discovery platform backend",
+  "type": "module",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "node --watch dist/main.js",
+    "start": "node dist/main.js",
+    "migrate": "node dist/main.js migrate",
+    "test": "node --test dist/tests/*.test.js",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": ["streetjs", "api", "discovery", "business"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "reflect-metadata": "^0.2.2",
+    "ws": "^8.18.0",
+    "zod": "^3.23.8",
+    "streetjs": "^1.2.10",
+    "@streetjs/orm": "^0.1.1",
+    "dotenv": "^16.4.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/ws": "^8.5.13",
+    "typescript": "^5.7.2"
+  }
+}
